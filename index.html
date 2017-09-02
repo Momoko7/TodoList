@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TODOlist</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .container{
+            margin: 0 auto;
+            width: 850px;
+            /*background-color: #f0f0f0;*/
+        }
+        .container-title{
+            text-align: center;
+            padding: 10px;
+        }
+        .container-title h1{
+            color: #17b2e2;
+            text-shadow: 5px 5px 5px #90b0e0;
+        }
+        .container-body h3{
+            letter-spacing: 3px;
+            margin: 5px;
+            color: #00A3FF;
+        }
+        .container-body .addtask{
+            width: 100%;
+            height: 30px;
+            border-radius: 5px;
+            border: solid 1px #CCCCCC;
+            padding-left: 6px;
+        }
+        .container-body p{
+            margin: 10px;
+            font-size: 15px;
+            color: #777777;
+            letter-spacing: 1.5px;
+        }
+        .btn-section button{
+            margin: 5px;
+            padding: 5px;
+            background-color: #fff;
+            border: 0.1px #aaaaaa solid;
+            border-radius: 3px;
+            color: #777777;
+        }
+        .task-list{
+            list-style: none;
+            /*width: 100%;*/
+            margin-left: 10px;
+        }
+        .task-list li{
+            width: 555px;
+            margin-bottom: -10px;
+        }
+        .task-list li:hover{
+
+        }
+        .task-list li span{
+            cursor:pointer;
+            margin: 10px;
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: solid #17b2e2 1px;
+        }
+        .task-list li .on{
+            background-color: #00A3FF;
+        }
+        .task-list li input{
+            position: relative;
+            top: -10px;
+            width: 500px;
+            height: 30px;
+            border: inherit;
+            padding-left: 5px;
+        }
+        .task-list li i{
+            float: right;
+            cursor: pointer;
+        }
+        .task-list li i:hover{
+            color: red;
+        }
+        footer .date{
+            text-align: right;
+        }
+        footer ul{
+            list-style: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container"  id="task">
+        <div class="container-title">
+            <h1>TODO list</h1>
+        </div>
+        <div class="container-body">
+            <h3>添加任务：</h3>
+            <input type="text" class="addtask" placeholder="例如：写作业... 按回车添加任务" @keydown.13="addTask" v-model="newTaskName">
+            <p class="">共{{totNum}}个任务 {{todoNum}}个任务未完成</p>
+            <div class="btn-section">
+                <button @click="showAll">所有任务</button>
+                <button @click="showTodo">未完成任务</button>
+                <button @click="showDid">完成的任务</button>
+            </div>
+            <div style="clear: both"></div>
+            <ul class="task-list" v-for="(task,index) in taskListShow">
+                <li>
+                    <span @click="selectTask(index)" :class="{on:task.statu?true:false}"></span>
+                    <input type="text" v-model="task.taskName">
+                    <i @click="deleteTask(index)">×</i>
+                </li>
+            </ul>
+        </div>
+        <hr/>
+        <footer>
+            <h2>Got it</h2>
+            <h4>事件还有：</h4>
+            <ul>
+                <li>click</li>
+                <li>keydown.keycode</li>
+                <li>keyup.keycode</li>
+                <li>...</li>
+            </ul>
+            <p class="date">2017.9.2</p>
+        </footer>
+    </div>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+<script>
+    var vm = new Vue({
+        el:"#task",
+        data:{
+            taskList:[],
+            taskListShow:[],
+            newTaskName:""
+        },
+        created:function () {
+            this.$http.get("data/list.json").then(res=>{
+                this.taskList = res.body.taskList;
+                this.taskListShow = this.taskList;
+                console.log(this.taskList)
+            })
+        },
+        methods:{
+            selectTask:function (index) {
+                this.taskList[index].statu = !this.taskList[index].statu;
+            },
+            deleteTask:function (index) {
+                this.taskList.splice(index,1)
+            },
+            addTask:function () {
+                var newTask={
+                    "taskName":this.newTaskName,
+                    "statu":false
+                };
+                this.taskList.push(newTask);
+                this.newTaskName="";
+            },
+            showAll:function () {
+                this.taskListShow = this.taskList;
+            },
+            showTodo:function () {
+                this.taskListShow = [];
+                for (var i=0; i<this.totNum; i++){
+                    if (!this.taskList[i].statu){
+                        this.taskListShow.push(this.taskList[i]);
+                    }
+                }
+            },
+            showDid:function () {
+                this.taskListShow = [];
+                for (var i=0; i<this.totNum; i++){
+                    if (this.taskList[i].statu){
+                        this.taskListShow.push(this.taskList[i]);
+                    }
+                }
+            }
+        },
+        computed:{
+            totNum:function () {
+                return totNum = this.taskList.length;
+            },
+            todoNum:function () {
+                var todoNum=0;
+                for (var i=0; i<this.totNum; i++){
+                    if (!this.taskList[i].statu){
+                        todoNum++;
+                    }
+                }
+                return todoNum;
+            }
+
+        }
+    })
+</script>
+</body>
+</html>
