@@ -88,9 +88,7 @@
         footer .date{
             text-align: right;
         }
-        footer ul{
-            list-style: none;
-        }
+
 
     </style>
 </head>
@@ -119,14 +117,28 @@
         </div>
         <hr/>
         <footer>
-            <h2>Got it</h2>
-            <h4>事件还有：</h4>
-            <ul>
-                <li>click</li>
-                <li>keydown.keycode</li>
-                <li>keyup.keycode</li>
-                <li>...</li>
-            </ul>
+            <h2>小结</h2>
+            <h4>实现监听键盘事件两种方法：</h4>
+            <p>1.直接在HTML标签内添加监听的键</p>
+            <pre>
+                @keydown.13="addTask"
+                @keyup.13="addTask"
+                方法内：
+                addTask:function(){
+                    //......
+                }
+            </pre>
+            <p>2.在方法内通过事件对象判断监听的键</p>
+            <pre>
+                @keydown="addTask"
+                @keyup="addTask"
+                方法内：ev是事件对象
+                addTask:function(e){
+                    if(e.code == 13){
+                        //.....
+                    }
+                }
+            </pre>
             <p class="date">2017.9.2</p>
         </footer>
     </div>
